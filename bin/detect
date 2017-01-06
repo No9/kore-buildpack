@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# bin/detect <build-dir>
+set -e
+echo "kore 1.0.0 detected"
+exit 0

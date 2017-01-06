@@ -1,0 +1,46 @@
+#! /bin/sh
+
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+
+cp $BUILD_DIR/serviceinfo.sh .
+APP=$(./serviceinfo.sh)
+
+echo "Running build for : $APP"
+
+echo "Creating profile.d"
+mkdir -p $BUILD_DIR/.profile.d
+cp $BP_DIR/profile/* $BUILD_DIR/.profile.d/
+
+echo "Building kore"
+cd $BP_DIR/vendor/kore
+ls
+make
+
+echo "enabling executable"
+chmod -R +x $BP_DIR/vendor/kore
+echo "Testing kore runs" 
+$BP_DIR/vendor/kore/kore -v
+
+echo "Building Service"
+mkdir $BP_DIR/vendor/service
+
+echo "Copying $BUILD_DIR/$APP to $BP_DIR/vendor/service/"
+cp -fr "$BUILD_DIR/$APP" $BP_DIR/vendor/service/
+
+echo "Building in $BP_DIR/vendor/service/$APP"
+cd "$BP_DIR/vendor/service/$APP"
+
+echo "Create includes and populate folder"
+mkdir -p ./src/includes
+cp -fr $BP_DIR/vendor/kore/includes ./src/includes/kore
+ls ./src/includes/kore
+echo "Start main build"
+$BP_DIR/vendor/kore/kore build
+chmod +x $APP
+cp $APP "$BUILD_DIR/$APP/"
+
+echo "Build complete"
+exit 0

@@ -1,0 +1,8 @@
+*.o
+*.swp
+*.swo
+*.module
+*.DSYM
+cert
+obj
+.lvimrc
